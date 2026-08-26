@@ -160,14 +160,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const formData = new FormData(contactForm);
       const action   = contactForm.getAttribute('action');
 
-      // Check if using placeholder Formspree URL
-      if (action.includes('YOUR_FORM_ID')) {
-        // Demo mode: just show the success state
-        contactForm.classList.add('hidden');
-        formSuccess.classList.remove('hidden');
-        return;
-      }
-
       try {
         const response = await fetch(action, {
           method: 'POST',
