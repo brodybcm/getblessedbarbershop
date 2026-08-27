@@ -559,10 +559,22 @@
 
     <!-- Lightbox -->
     <div id="lightbox" class="fixed inset-0 z-[60] bg-dark/95 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-      <button id="lightbox-close" class="absolute top-6 right-6 text-light hover:text-gold transition-colors" aria-label="Close lightbox">
+      <!-- Close Button -->
+      <button id="lightbox-close" class="absolute top-6 right-6 text-light hover:text-gold transition-colors z-[70]" aria-label="Close lightbox">
         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
       </button>
-      <img id="lightbox-img" src="" alt="Gallery image" class="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl">
+
+      <!-- Prev Button -->
+      <button id="lightbox-prev" class="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 text-light hover:text-gold transition-colors z-[70] bg-dark/40 hover:bg-dark/80 p-2 rounded-full" aria-label="Previous image">
+        <svg class="w-8 h-8 sm:w-10 sm:h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      </button>
+
+      <!-- Next Button -->
+      <button id="lightbox-next" class="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 text-light hover:text-gold transition-colors z-[70] bg-dark/40 hover:bg-dark/80 p-2 rounded-full" aria-label="Next image">
+        <svg class="w-8 h-8 sm:w-10 sm:h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      </button>
+
+      <img id="lightbox-img" src="" alt="Gallery image" class="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl transition-opacity duration-300">
     </div>
   </section>
 

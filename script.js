@@ -74,52 +74,116 @@ document.addEventListener('DOMContentLoaded', () => {
   const lightbox     = document.getElementById('lightbox');
   const lightboxImg  = document.getElementById('lightbox-img');
   const lightboxClose = document.getElementById('lightbox-close');
+  const lightboxPrev = document.getElementById('lightbox-prev');
+  const lightboxNext = document.getElementById('lightbox-next');
   const galleryItems = document.querySelectorAll('.gallery-item');
-
-  galleryItems.forEach(item => {
-    item.addEventListener('click', () => {
-      const img = item.querySelector('img');
-      if (!img) return;
-
-      // Use a larger version of the image for the lightbox
-      const src = img.src.replace('w=600', 'w=1200');
-      lightboxImg.src = src;
-      lightboxImg.alt = img.alt;
-      lightbox.classList.remove('hidden');
-
-      // Trigger animation on next frame
-      requestAnimationFrame(() => {
-        lightbox.classList.add('active');
+  
+  let currentImageIndex = 0;
+  let galleryData = [];
+  
+  // Extract data once to avoid querying the DOM repeatedly
+  galleryItems.forEach((item, index) => {
+    const img = item.querySelector('img');
+    if (img) {
+      galleryData.push({
+        src: img.src.replace('w=600', 'w=1200'),
+        alt: img.alt
       });
-
-      document.body.classList.add('menu-open');
-    });
+      
+      // Click event for opening lightbox
+      item.addEventListener('click', () => {
+        currentImageIndex = index;
+        updateLightboxImage(false);
+        openLightbox();
+      });
+    }
   });
+
+  function updateLightboxImage(animate = true) {
+    if (animate) {
+      lightboxImg.classList.add('opacity-0');
+      setTimeout(() => {
+        lightboxImg.src = galleryData[currentImageIndex].src;
+        lightboxImg.alt = galleryData[currentImageIndex].alt;
+        lightboxImg.classList.remove('opacity-0');
+      }, 150);
+    } else {
+      lightboxImg.src = galleryData[currentImageIndex].src;
+      lightboxImg.alt = galleryData[currentImageIndex].alt;
+      lightboxImg.classList.remove('opacity-0');
+    }
+  }
+
+  function openLightbox() {
+    lightbox.classList.remove('hidden');
+    requestAnimationFrame(() => {
+      lightbox.classList.add('active');
+    });
+    document.body.classList.add('menu-open');
+  }
 
   function closeLightbox() {
     lightbox.classList.remove('active');
     document.body.classList.remove('menu-open');
-
-    // Wait for animation to finish before hiding
     setTimeout(() => {
       lightbox.classList.add('hidden');
       lightboxImg.src = '';
     }, 300);
   }
 
-  lightboxClose.addEventListener('click', closeLightbox);
+  function showNextImage() {
+    currentImageIndex = (currentImageIndex + 1) % galleryData.length;
+    updateLightboxImage();
+  }
 
+  function showPrevImage() {
+    currentImageIndex = (currentImageIndex - 1 + galleryData.length) % galleryData.length;
+    updateLightboxImage();
+  }
+
+  lightboxClose.addEventListener('click', closeLightbox);
+  lightboxNext.addEventListener('click', (e) => { e.stopPropagation(); showNextImage(); });
+  lightboxPrev.addEventListener('click', (e) => { e.stopPropagation(); showPrevImage(); });
+
+  // Close on outside click
   lightbox.addEventListener('click', (e) => {
     if (e.target === lightbox) closeLightbox();
   });
 
-  // Close lightbox with Escape key
+  // Keyboard controls & Esc
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       if (!lightbox.classList.contains('hidden')) closeLightbox();
-      if (mobileMenu.classList.contains('translate-x-0')) closeMenu();
+      if (mobileMenu && mobileMenu.classList.contains('translate-x-0')) closeMenu();
+    }
+    if (!lightbox.classList.contains('hidden')) {
+      if (e.key === 'ArrowRight') showNextImage();
+      if (e.key === 'ArrowLeft') showPrevImage();
     }
   });
+
+  // Swipe Support for mobile
+  let touchStartX = 0;
+  let touchEndX = 0;
+
+  lightbox.addEventListener('touchstart', e => {
+    touchStartX = e.changedTouches[0].screenX;
+  }, { passive: true });
+
+  lightbox.addEventListener('touchend', e => {
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipe();
+  }, { passive: true });
+
+  function handleSwipe() {
+    const swipeThreshold = 50;
+    if (touchEndX < touchStartX - swipeThreshold) {
+      showNextImage();
+    }
+    if (touchEndX > touchStartX + swipeThreshold) {
+      showPrevImage();
+    }
+  }
 
 
   // ---- Scroll-triggered Fade-in Animations (Intersection Observer) ----
